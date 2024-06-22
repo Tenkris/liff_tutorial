@@ -40,15 +40,14 @@ export default function Home() {
     window.location.reload();
   };
   const handleSubmit = async () => {
-    console.log("text", text);
+    const url = process.env.NEXT_PUBLIC_BACKEND_URL + "/send-message";
+    console.log("url", url);
+    console.log(process.env.NEXT_PUBLIC_BACKEND_URL);
     try {
-      const response = await axios.post(
-        process.env.BACKEND_URL + "/send-message",
-        {
-          userId: profile.userId,
-          message: text,
-        }
-      );
+      const response = await axios.post(url, {
+        userId: profile.userId,
+        message: text,
+      });
       console.log(response.data);
     } catch (error) {
       if (error instanceof Error) {
