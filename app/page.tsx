@@ -3,14 +3,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import liff from "@line/liff";
 import axios from "axios";
-
 export default function Home() {
-  const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-  const [profile, setProfile] = useState({});
+  const liffId = process.env.NEXT_PUBLIC_LIFF_ID || "";
+  const [profile, setProfile] = useState<any>({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [text, setText] = useState("");
 
-  const handleChange = (event) => {
+  const handleChange = (event: any) => {
     setText(event.target.value);
   };
 
@@ -19,15 +18,19 @@ export default function Home() {
       try {
         await liff.init({ liffId });
       } catch (error) {
-        console.error("liff init error", error.message);
+        if (error instanceof Error) {
+          console.error("liff init error", error.message);
+        } else {
+          console.error("liff init error", error);
+        }
       }
       if (!liff.isLoggedIn()) {
         liff.login();
         setIsLoggedIn(true);
       }
-      const profile = await liff.getProfile();
-      console.log("profile", profile);
-      setProfile(profile);
+      const res = await liff.getProfile();
+      console.log("profile", res);
+      setProfile(res);
     };
     initLiff();
   }, [liffId]);
@@ -48,7 +51,11 @@ export default function Home() {
       );
       console.log(response.data);
     } catch (error) {
-      console.error("sendMessages error", error.message);
+      if (error instanceof Error) {
+        console.error("send messsage error", error.message);
+      } else {
+        console.error("send messsage error", error);
+      }
     }
     setText("");
   };
@@ -58,19 +65,16 @@ export default function Home() {
       <div>
         <h1>LINE Front-end Framework </h1>
         <div className="flex flex-col justify-center items-center">
-          {profile && (
-            <div>
-              <p> display-name : {profile.displayName}</p>
-              <p> userId : {profile.userId}</p>
-              <img
-                src={profile.pictureUrl}
-                alt={profile.displayName}
-                width={100}
-                height={100}
-              />
-            </div>
-          )}
-
+          <div>
+            <p> display-name : {profile.displayName}</p>
+            <p> userId : {profile.userId}</p>
+            <img
+              src={profile.pictureUrl}
+              alt={profile.displayName}
+              width={100}
+              height={100}
+            />
+          </div>
           <button onClick={logout} className=" bg-blue-400">
             Logout
           </button>
